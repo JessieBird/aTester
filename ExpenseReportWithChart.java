@@ -75,25 +75,35 @@ public class ExpenseReportWithChart {
         JTable reportTable = new JTable(reportTableModel);
         JScrollPane reportScrollPane = new JScrollPane(reportTable);
 
-        JPanel summaryPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        // 建立摘要區域
+        JPanel summaryPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 改成3行2列
         summaryPanel.setBorder(BorderFactory.createTitledBorder("Summary"));
-
+        
         JLabel totalRevenueLabel = new JLabel("Total Revenue:");
         JLabel totalRevenueValue = new JLabel(String.format("%.2f", totalRevenue));
-
+        
         JLabel totalExpenseLabel = new JLabel("Total Expense:");
         JLabel totalExpenseValue = new JLabel(String.format("%.2f", totalExpense));
-
+        
+        // 計算剩餘金額
+        double remainingAmount = totalRevenue - totalExpense;
+        JLabel remainingAmountLabel = new JLabel("Remaining Amount:");
+        JLabel remainingAmountValue = new JLabel(String.format("%.2f", remainingAmount));
+        
+        // 將標籤加入到摘要區域
         summaryPanel.add(totalRevenueLabel);
         summaryPanel.add(totalRevenueValue);
         summaryPanel.add(totalExpenseLabel);
         summaryPanel.add(totalExpenseValue);
-
-        reportFrame.add(reportScrollPane, BorderLayout.CENTER);
-        reportFrame.add(summaryPanel, BorderLayout.SOUTH);
-
-        reportFrame.setVisible(true);
-    }
+        summaryPanel.add(remainingAmountLabel);
+        summaryPanel.add(remainingAmountValue);
+    
+    
+            reportFrame.add(reportScrollPane, BorderLayout.CENTER);
+            reportFrame.add(summaryPanel, BorderLayout.SOUTH);
+    
+            reportFrame.setVisible(true);
+        }
 
 }
 
