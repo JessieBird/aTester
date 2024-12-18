@@ -140,11 +140,11 @@ class ExpenseTracker {
 
 
         // Category choice
-        JLabel categoryLabel = new JLabel("Category:");
-        String[] categories = {"Food", "Clothes", "Entertainment"};
-        JComboBox<String> categoryComboBox = new JComboBox<>(categories);
-        inputPanel.add(categoryLabel);
-        inputPanel.add(categoryComboBox);
+        //JLabel categoryLabel = new JLabel("Category:");
+        //String[] categories = {"Food", "Clothes", "Entertainment"};
+        //JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+        //inputPanel.add(categoryLabel);
+        //inputPanel.add(categoryComboBox);
 
         // Enter the Amount
         JLabel amountLabel = new JLabel("Amount:");
