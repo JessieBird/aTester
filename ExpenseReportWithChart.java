@@ -244,14 +244,23 @@ class ExpenseTracker {
             public void actionPerformed(ActionEvent e) {
                 String date = dateField.getText();
                 String time = timeField.getText();
+                String selectedrevenueOrExpense = (String) revenueOrExpenseComboBox.getSelectedItem();
                 String money = (String) moneyComboBox.getSelectedItem(); 
                 String category = (String) categoryComboBox.getSelectedItem();
                 String amount = amountField.getText();
 
+                String categoryOrMoney;
+        
+                // 根據 Revenue/Expense 選擇正確的值
+                if ("Revenue".equals(selectedrevenueOrExpense)) {
+                    categoryOrMoney = (String) moneyComboBox.getSelectedItem(); // 取得 Revenue 類別
+                } else {
+                    categoryOrMoney = (String) categoryComboBox.getSelectedItem(); // 取得 Expense 類別
+                }
                 // 驗證金額是否正確
                 try {
                     double parsedAmount = Double.parseDouble(amount);
-                    String[] record = {date, time, category, String.format("%.2f", parsedAmount)};
+                    String[] record = {date, time, selectedrevenueOrExpense,categoryOrMoney, String.format("%.2f", parsedAmount)};
                     records.add(record);
 
                     // Update the form
