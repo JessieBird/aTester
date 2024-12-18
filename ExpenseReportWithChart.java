@@ -86,6 +86,59 @@ class ExpenseTracker {
         inputPanel.add(timeLabel);
         inputPanel.add(timeField);
 
+        //r or e
+        JLabel revenueOrExpenseLabel = new JLabel("Revenue/Expense:");
+        String[] revenueOrExpense = {"Revenue", "Expense"};
+        JComboBox<String> revenueOrExpenseComboBox = new JComboBox<>(revenueOrExpense);
+        inputPanel.add(revenueOrExpenseLabel);
+        inputPanel.add(revenueOrExpenseComboBox);
+
+
+        // Revenue/Category 選單容器
+        JPanel dynamicPanel = new JPanel(new GridLayout(1, 4, 10, 10));
+
+                // Revenue 選單
+                JLabel moneyLabel = new JLabel("Revenue category:");
+                String[] money = {"Salary", "Lottery", "Pocket money", "Investment profit", "Interest", "Others"};
+                JComboBox<String> moneyComboBox = new JComboBox<>(money);
+
+                // Category 選單
+                JLabel categoryLabel = new JLabel("Expense category:");
+                String[] categories = {"Food", "Grocery", "Transport", "Entertainment", "Shopping", "Medical", "Bill", "Education", "Others"};
+                JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+                
+                // 預設顯示 Revenue 選單
+                dynamicPanel.add(moneyLabel);
+                dynamicPanel.add(moneyComboBox);
+
+                // 添加到 inputPanel
+                inputPanel.add(dynamicPanel);
+                
+
+                // 根據 Revenue/Expense 選擇動態顯示對應的選單
+                revenueOrExpenseComboBox.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // 清空 dynamicPanel 的內容
+                        dynamicPanel.removeAll();
+
+                        // 根據選擇的值顯示對應的選單
+                        if ("Revenue".equals(revenueOrExpenseComboBox.getSelectedItem())) {
+                            dynamicPanel.add(moneyLabel);
+                            dynamicPanel.add(moneyComboBox);
+                        } else {
+                            dynamicPanel.add(categoryLabel);
+                            dynamicPanel.add(categoryComboBox);
+
+                        }
+
+                        // 重新繪製介面
+                        dynamicPanel.revalidate();
+                        dynamicPanel.repaint();
+                    }
+                });
+
+
         // Category choice
         JLabel categoryLabel = new JLabel("Category:");
         String[] categories = {"Food", "Clothes", "Entertainment"};
@@ -110,6 +163,49 @@ class ExpenseTracker {
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(table);
+
+        //下方表格依據Revenue跟Expense顯示
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = dateField.getText();
+                String time = timeField.getText();
+                String revenueOrExpense = (String) revenueOrExpenseComboBox.getSelectedItem();
+                String categoryOrMoney;
+        
+                // 根據 Revenue/Expense 選擇正確的值
+                if ("Revenue".equals(revenueOrExpense)) {
+                    categoryOrMoney = (String) moneyComboBox.getSelectedItem(); // 取得 Revenue 類別
+                } else {
+                    categoryOrMoney = (String) categoryComboBox.getSelectedItem(); // 取得 Expense 類別
+                }
+        
+                String amount = amountField.getText();
+        
+                // 驗證金額是否正確
+                try {
+                    double parsedAmount = Double.parseDouble(amount);
+        
+                    // 建立記錄
+                    String[] record = {date, time, revenueOrExpense, categoryOrMoney, String.format("%.2f", parsedAmount)};
+                    records.add(record);
+        
+                    // 更新表格
+                    tableModel.addRow(record);
+        
+                    // 清空輸入框
+                    dateField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    timeField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+                    amountField.setText("");
+        
+                    // 恢復到 Revenue/Expense 預設選項
+                    revenueOrExpenseComboBox.setSelectedIndex(0);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "請輸入有效的金額！", "輸入錯誤", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
 
         // 將輸入區域與表格區域加入框架
         frame.add(inputPanel, BorderLayout.NORTH);
