@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
+import java.util.Map;
 public class ExpenseReportWithChart {
     public static void generateReport(JFrame parentFrame, ArrayList<String[]> records) {
         if (records.isEmpty()) {
             JOptionPane.showMessageDialog(parentFrame, "No records to generate General Report!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        HashMap<String, Double> revenueCategoryTotals = new HashMap<>();
+        HashMap<String, Double> expenseCategoryTotals = new HashMap<>();
         // 計算分類總金額和整體總金額
         HashMap<String, Double> categoryTotals = new HashMap<>();
         double totalExpense = 0;
@@ -42,8 +43,10 @@ public class ExpenseReportWithChart {
 
             if ("Expense".equalsIgnoreCase(type)) {
                 totalExpense += amount;
+                expenseCategoryTotals.put(category, expenseCategoryTotals.getOrDefault(category, 0.0) + amount);
             } else if ("Revenue".equalsIgnoreCase(type)) {
                 totalRevenue += amount;
+                revenueCategoryTotals.put(category, revenueCategoryTotals.getOrDefault(category, 0.0) + amount);
             }
         }
 
@@ -51,7 +54,27 @@ public class ExpenseReportWithChart {
         reportFrame.setSize(800, 500);
         reportFrame.setLayout(new BorderLayout());
 
-        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"Date", "Time", "Type", "Category", "Amount", "Percentage"}, 0);
+        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"Type", "Category", "Amount", "Percentage"}, 0);
+
+        for (Map.Entry<String, Double> entry : revenueCategoryTotals.entrySet()) {
+
+            String category = entry.getKey();
+            double amount = categoryTotals.get(category);
+            double percentage = (categoryTotals.get(category) / totalRevenue) * 100;
+
+            reportTableModel.addRow(new Object[]{"Revenue",category, String.format("%.2f",amount),  String.format("%.2f%%",percentage)});
+        }
+
+
+        for (Map.Entry<String, Double> entry : expenseCategoryTotals.entrySet()) {
+            String category = entry.getKey();
+            double amount = categoryTotals.get(category);
+            double percentage = (categoryTotals.get(category) / totalExpense) * 100;
+
+            reportTableModel.addRow(new Object[]{"Expense",category, String.format("%.2f",amount),  String.format("%.2f%%",percentage)});
+
+        }
+
 
         for (String[] record : records) {
             if (record.length < 5) continue;
@@ -74,7 +97,7 @@ public class ExpenseReportWithChart {
             } else if (type.equals("Expense")) {
                 percentage = (categoryTotals.get(category) / totalExpense) * 100;
             }
-            reportTableModel.addRow(new Object[]{date, time, type, category, String.format("%.2f", amount), String.format("%.2f%%", percentage)});
+            //reportTableModel.addRow(new Object[]{date, time, type, category, String.format("%.2f", amount), String.format("%.2f%%", percentage)});
         }
 
         JTable reportTable = new JTable(reportTableModel);
@@ -83,18 +106,18 @@ public class ExpenseReportWithChart {
         // 建立摘要區域
         JPanel summaryPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 改成3行2列
         summaryPanel.setBorder(BorderFactory.createTitledBorder("Summary"));
-        
+
         JLabel totalRevenueLabel = new JLabel("Total Revenue:");
         JLabel totalRevenueValue = new JLabel(String.format("%.2f", totalRevenue));
-        
+
         JLabel totalExpenseLabel = new JLabel("Total Expense:");
         JLabel totalExpenseValue = new JLabel(String.format("%.2f", totalExpense));
-        
+
         // 計算剩餘金額
         double remainingAmount = totalRevenue - totalExpense;
         JLabel remainingAmountLabel = new JLabel("Remaining Amount:");
         JLabel remainingAmountValue = new JLabel(String.format("%.2f", remainingAmount));
-        
+
         // 將標籤加入到摘要區域
         summaryPanel.add(totalRevenueLabel);
         summaryPanel.add(totalRevenueValue);
@@ -102,13 +125,13 @@ public class ExpenseReportWithChart {
         summaryPanel.add(totalExpenseValue);
         summaryPanel.add(remainingAmountLabel);
         summaryPanel.add(remainingAmountValue);
-    
-    
-            reportFrame.add(reportScrollPane, BorderLayout.CENTER);
-            reportFrame.add(summaryPanel, BorderLayout.SOUTH);
-    
-            reportFrame.setVisible(true);
-        }
+
+
+        reportFrame.add(reportScrollPane, BorderLayout.CENTER);
+        reportFrame.add(summaryPanel, BorderLayout.SOUTH);
+
+        reportFrame.setVisible(true);
+    }
 
 }
 
@@ -272,8 +295,8 @@ class ExpenseTracker {
                     tableModel.addRow(record);
 
                     // 清空輸入框
-                    dateField.setText("");
-                    timeField.setText("");
+                    dateField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    timeField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
                     amountField.setText("");
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(frame, "請輸入有效的金額！", "輸入錯誤", JOptionPane.ERROR_MESSAGE);
