@@ -344,7 +344,7 @@ class ExpenseTracker {
                     LocalDate end = LocalDate.parse(endDate, formatter);
 
                     // 重新過濾記錄
-                    DefaultTableModel filterReportModel = new DefaultTableModel(new String[]{"日期", "分類", "金額", "百分比"}, 0);
+                    DefaultTableModel filterReportModel = new DefaultTableModel(new String[]{"日期", "分類", "金額"}, 0);
                     HashMap<String, Double> filteredTotals = new HashMap<>();
                     double totalFilteredExpense = 0;
 
@@ -353,8 +353,8 @@ class ExpenseTracker {
                         if ((recordDate.isEqual(start) || recordDate.isAfter(start)) &&
                                 (recordDate.isEqual(end) || recordDate.isBefore(end))) {
 
-                            String category = record[2];
-                            double amount = Double.parseDouble(record[3]);
+                            String category = record[3];
+                            double amount = Double.parseDouble(record[4]);
                             filteredTotals.put(category, filteredTotals.getOrDefault(category, 0.0) + amount);
                             totalFilteredExpense += amount;
 
@@ -362,15 +362,6 @@ class ExpenseTracker {
                             filterReportModel.addRow(new Object[]{record[0], category, String.format("%.2f", amount), ""});
                         }
                     }
-
-                    // Caiculate the percentage and update forms
-                    for (int i = 0; i < filterReportModel.getRowCount(); i++) {
-                        String category = (String) filterReportModel.getValueAt(i, 1);
-                        double total = filteredTotals.get(category);
-                        double percentage = (total / totalFilteredExpense) * 100;
-                        filterReportModel.setValueAt(String.format("%.2f%%", percentage), i, 3);
-                    }
-
                     JTable filterReportTable = new JTable(filterReportModel);
                     JScrollPane filterReportScrollPane = new JScrollPane(filterReportTable);
 
