@@ -69,6 +69,11 @@ public class ExpenseReportWithChart {
             }
 
             double percentage = (categoryTotals.get(category) / (totalExpense + totalRevenue)) * 100;
+            if (type.equals("Revenue")) {
+                percentage = (categoryTotals.get(category) / totalRevenue) * 100;
+            } else if (type.equals("Expense")) {
+                percentage = (categoryTotals.get(category) / totalExpense) * 100;
+            }
             reportTableModel.addRow(new Object[]{date, time, type, category, String.format("%.2f", amount), String.format("%.2f%%", percentage)});
         }
 
