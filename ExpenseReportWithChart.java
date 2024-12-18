@@ -19,44 +19,82 @@ public class ExpenseReportWithChart {
         // 計算分類總金額和整體總金額
         HashMap<String, Double> categoryTotals = new HashMap<>();
         double totalExpense = 0;
+        double totalRevenue = 0;
 
         for (String[] record : records) {
-            String category = record[2];
-            double amount = Double.parseDouble(record[3]);
+            if (record.length < 5) {
+                JOptionPane.showMessageDialog(parentFrame, "Invalid record detected. Skipping record.", "Warning", JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            String type = record[2];
+            String category = record[3];
+            double amount;
+
+            try {
+                amount = Double.parseDouble(record[4]);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(parentFrame, "Invalid amount detected in record.", "Warning", JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
 
             categoryTotals.put(category, categoryTotals.getOrDefault(category, 0.0) + amount);
-            totalExpense += amount;
+
+            if ("Expense".equalsIgnoreCase(type)) {
+                totalExpense += amount;
+            } else if ("Revenue".equalsIgnoreCase(type)) {
+                totalRevenue += amount;
+            }
         }
 
-        // 建立報表框架
-        JFrame reportFrame = new JFrame("General Report with Time");
-        reportFrame.setSize(700, 400);
+        JFrame reportFrame = new JFrame("General Report");
+        reportFrame.setSize(800, 500);
         reportFrame.setLayout(new BorderLayout());
 
-        // 建立報表內容，新增日期和時間列
-        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"Date", "Time", "Category", "Toal Amount", "Percentage"}, 0);
+        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"Date", "Time", "Type", "Category", "Amount", "Percentage"}, 0);
 
         for (String[] record : records) {
+            if (record.length < 5) continue;
+
             String date = record[0];
             String time = record[1];
-            String category = record[2];
-            double amount = Double.parseDouble(record[3]);
-            double percentage = (categoryTotals.get(category) / totalExpense) * 100;
+            String type = record[2];
+            String category = record[3];
+            double amount;
 
-            // 加入每條記錄到表格中
-            reportTableModel.addRow(new Object[]{date, time, category, String.format("%.2f", amount), String.format("%.2f%%", percentage)});
+            try {
+                amount = Double.parseDouble(record[4]);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+
+            double percentage = (categoryTotals.get(category) / (totalExpense + totalRevenue)) * 100;
+            reportTableModel.addRow(new Object[]{date, time, type, category, String.format("%.2f", amount), String.format("%.2f%%", percentage)});
         }
 
-        // 創建表格並包裹到 JScrollPane 中
         JTable reportTable = new JTable(reportTableModel);
         JScrollPane reportScrollPane = new JScrollPane(reportTable);
 
-        // 將報表內容加入框架
-        reportFrame.add(reportScrollPane, BorderLayout.CENTER);
+        JPanel summaryPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        summaryPanel.setBorder(BorderFactory.createTitledBorder("Summary"));
 
-        // 顯示報表框架
+        JLabel totalRevenueLabel = new JLabel("Total Revenue:");
+        JLabel totalRevenueValue = new JLabel(String.format("%.2f", totalRevenue));
+
+        JLabel totalExpenseLabel = new JLabel("Total Expense:");
+        JLabel totalExpenseValue = new JLabel(String.format("%.2f", totalExpense));
+
+        summaryPanel.add(totalRevenueLabel);
+        summaryPanel.add(totalRevenueValue);
+        summaryPanel.add(totalExpenseLabel);
+        summaryPanel.add(totalExpenseValue);
+
+        reportFrame.add(reportScrollPane, BorderLayout.CENTER);
+        reportFrame.add(summaryPanel, BorderLayout.SOUTH);
+
         reportFrame.setVisible(true);
     }
+
 }
 
 class ExpenseTracker {
