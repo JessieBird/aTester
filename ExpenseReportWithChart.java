@@ -182,27 +182,6 @@ class ExpenseTracker {
         
                 String amount = amountField.getText();
         
-                // 驗證金額是否正確
-                try {
-                    double parsedAmount = Double.parseDouble(amount);
-        
-                    // 建立記錄
-                    String[] record = {date, time, revenueOrExpense, categoryOrMoney, String.format("%.2f", parsedAmount)};
-                    records.add(record);
-        
-                    // 更新表格
-                    tableModel.addRow(record);
-        
-                    // 清空輸入框
-                    dateField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                    timeField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
-                    amountField.setText("");
-        
-                    // 恢復到 Revenue/Expense 預設選項
-                    revenueOrExpenseComboBox.setSelectedIndex(0);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(frame, "請輸入有效的金額！", "輸入錯誤", JOptionPane.ERROR_MESSAGE);
-                }
             }
         });
 
@@ -217,6 +196,7 @@ class ExpenseTracker {
             public void actionPerformed(ActionEvent e) {
                 String date = dateField.getText();
                 String time = timeField.getText();
+                String money = (String) moneyComboBox.getSelectedItem(); 
                 String category = (String) categoryComboBox.getSelectedItem();
                 String amount = amountField.getText();
 
