@@ -34,7 +34,7 @@ public class ExpenseReportWithChart {
         reportFrame.setLayout(new BorderLayout());
 
         // 建立報表內容，新增日期和時間列
-        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"日期", "時間", "分類", "金額", "百分比"}, 0);
+        DefaultTableModel reportTableModel = new DefaultTableModel(new String[]{"Date", "Time", "Category", "Toal Amount", "Percentage"}, 0);
 
         for (String[] record : records) {
             String date = record[0];
@@ -71,7 +71,7 @@ class ExpenseTracker {
         frame.setLayout(new BorderLayout());
 
         // The era of above section
-        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2, 10, 10));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Create a new record"));
 
         // Date Input
@@ -159,7 +159,7 @@ class ExpenseTracker {
         inputPanel.add(reportButton);
 
         //The area of the below form
-        String[] columnNames = {"Date", "Time", "Category", "Amount"};
+        String[] columnNames = {"Date", "Time", "Revenue/Expense" , "Category", "Amount"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(table);
